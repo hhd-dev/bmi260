@@ -8,12 +8,18 @@
 #include <linux/mod_devicetable.h>
 #include <linux/module.h>
 #include <linux/regmap.h>
+#include <linux/version.h>
 
 #include "bmi260.h"
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 static int bmi260_i2c_probe(struct i2c_client *client)
 {
 	const struct i2c_device_id *id = i2c_client_get_device_id(client);
+#else
+static int bmi260_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
+{
+#endif
 	struct regmap *regmap;
 	const char *name;
 
