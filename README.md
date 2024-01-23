@@ -18,10 +18,27 @@ pikaur -S bmi260-dkms
 ```
 
 ## ❄️ NixOS 
-The `bmi260` driver has been packaged for NixOS here: https://github.com/Cryolitia/nur-packages/blob/master/modules/bmi260.nix
 
-Refer to [this commit](https://github.com/Cryolitia/nixos-config/commit/1ff4c1ea97313f59ee3cc051eb8481583033bdf0) 
-for adding it to your personal NixOS config.
+Using nix flakes support
+
+```
+{
+  description = "NixOS configuration with flakes";
+  inputs.cryolitia-nur.url = "github:Cryolitia/nur-packages/master";
+
+  outputs = { self, nixpkgs, cryolitia-nur }: {
+    # replace <your-hostname> with your actual hostname
+    nixosConfigurations.<your-hostname> = nixpkgs.lib.nixosSystem {
+      # ...
+      modules = [
+        # ...
+        nur-cryolitia.nixosModules.bmi260
+        hardware.sensor.iio.bmi260.enable = true;
+      ];
+    };
+  };
+}
+```
 
 ## Other Distributions
 You can also install as a DKMS package manually if you are on Fedora or another distro.
