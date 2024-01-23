@@ -21,6 +21,7 @@ pikaur -S bmi260-dkms
 
 Using nix flakes support
 
+There is a NUR module maintained by [@Cryolitia](https://github.com/Cryolitia)
 ```
 {
   description = "NixOS configuration with flakes";
@@ -32,7 +33,7 @@ Using nix flakes support
       # ...
       modules = [
         # ...
-        nur-cryolitia.nixosModules.bmi260
+        cryolitia-nur.nixosModules.bmi260
         hardware.sensor.iio.bmi260.enable = true;
       ];
     };
