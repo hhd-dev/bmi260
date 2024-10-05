@@ -65,6 +65,7 @@ static struct i2c_driver bmi260_i2c_driver = {
 		.name			= "bmi260_i2c",
 		.acpi_match_table	= bmi260_acpi_match,
 		.of_match_table		= bmi260_of_match,
+		.pm					= &bmi260_pm_ops,
 	},
 	.probe		= bmi260_i2c_probe,
 	.id_table	= bmi260_i2c_id,

@@ -16,6 +16,7 @@ struct bmi260_data {
 	struct regulator_bulk_data supplies[2];
 	struct iio_mount_matrix orientation;
 	enum bmi260_int_pin int_pin;
+	bool use_spi;
 
 	/*
 	 * Ensure natural alignment for timestamp if present.
@@ -34,5 +35,7 @@ int bmi260_core_probe(struct device *dev, struct regmap *regmap,
 int bmi260_enable_irq(struct regmap *regmap, enum bmi260_int_pin pin, bool enable);
 
 int bmi260_probe_trigger(struct iio_dev *indio_dev, int irq, u32 irq_type);
+
+extern const struct dev_pm_ops bmi260_pm_ops;
 
 #endif  /* BMI260_H_ */

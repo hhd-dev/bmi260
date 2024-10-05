@@ -757,8 +757,9 @@ static int bmi260_setup_irq(struct iio_dev *indio_dev, int irq,
 	return bmi260_probe_trigger(indio_dev, irq, irq_type);
 }
 
-static int bmi260_chip_init(struct bmi260_data *data, bool use_spi)
+static int bmi260_chip_init(void *void_data)
 {
+	struct bmi260_data *data = void_data;
 	int ret;
 	unsigned int val;
 	struct device *dev = regmap_get_device(data->regmap);
@@ -779,7 +780,7 @@ static int bmi260_chip_init(struct bmi260_data *data, bool use_spi)
 	 * CS rising edge is needed before starting SPI, so do a dummy read
 	 * See Section 4.4, page 25 of the datasheet
 	 */
-	if (use_spi) {
+	if (data->use_spi) {
 		ret = regmap_read(data->regmap, BMI260_REG_DUMMY, &val);
 		if (ret)
 			goto disable_regulator;
@@ -926,6 +927,7 @@ int bmi260_core_probe(struct device *dev, struct regmap *regmap,
 	data = iio_priv(indio_dev);
 	dev_set_drvdata(dev, indio_dev);
 	data->regmap = regmap;
+	data->use_spi = use_spi;
 
 	data->supplies[0].supply = "vdd";
 	data->supplies[1].supply = "vddio";
@@ -943,7 +945,7 @@ int bmi260_core_probe(struct device *dev, struct regmap *regmap,
 			return ret;
 	}
 
-	ret = bmi260_chip_init(data, use_spi);
+	ret = bmi260_chip_init(data);
 	if (ret)
 		return ret;
 
@@ -980,6 +982,19 @@ int bmi260_core_probe(struct device *dev, struct regmap *regmap,
 	return devm_iio_device_register(dev, indio_dev);
 }
 EXPORT_SYMBOL_NS_GPL(bmi260_core_probe, IIO_BMI260);
+
+static int bmi260_chip_resume(struct device *dev) {
+	struct bmi260_data *data = iio_priv(dev_get_drvdata(dev));
+	return bmi260_chip_init(data);
+}
+
+static int bmi260_chip_suspend(struct device *dev) {
+	struct bmi260_data *data = iio_priv(dev_get_drvdata(dev));
+	bmi260_chip_uninit(data);
+	return 0;
+}
+
+EXPORT_SIMPLE_DEV_PM_OPS(bmi260_pm_ops, bmi260_chip_suspend, bmi260_chip_resume);
 
 MODULE_AUTHOR("Justin Weiss <justin@justinweiss.com>");
 MODULE_DESCRIPTION("Bosch BMI260 driver");
