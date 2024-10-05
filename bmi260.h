@@ -10,6 +10,15 @@ enum bmi260_int_pin {
 	BMI260_PIN_INT2
 };
 
+struct bmi260_config {
+	int accel_scale;
+	int accel_odr;
+	int accel_uodr;
+	int gyro_scale;
+	int gyro_odr;
+	int gyro_uodr;
+};
+
 struct bmi260_data {
 	struct regmap *regmap;
 	struct iio_trigger *trig;
@@ -17,6 +26,7 @@ struct bmi260_data {
 	struct iio_mount_matrix orientation;
 	enum bmi260_int_pin int_pin;
 	bool use_spi;
+	struct bmi260_config conf;
 
 	/*
 	 * Ensure natural alignment for timestamp if present.

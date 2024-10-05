@@ -985,11 +985,22 @@ EXPORT_SYMBOL_NS_GPL(bmi260_core_probe, IIO_BMI260);
 
 static int bmi260_chip_resume(struct device *dev) {
 	struct bmi260_data *data = iio_priv(dev_get_drvdata(dev));
-	return bmi260_chip_init(data);
+	int ret = bmi260_chip_init(data);
+	if (ret)
+		return ret;
+	bmi260_set_scale(data, BMI260_ACCEL, data->conf.accel_scale);
+	bmi260_set_scale(data, BMI260_GYRO, data->conf.gyro_scale);
+	bmi260_set_odr(data, BMI260_ACCEL, data->conf.accel_odr, data->conf.accel_uodr);
+	bmi260_set_odr(data, BMI260_GYRO, data->conf.gyro_odr, data->conf.gyro_uodr);
+	return 0;
 }
 
 static int bmi260_chip_suspend(struct device *dev) {
 	struct bmi260_data *data = iio_priv(dev_get_drvdata(dev));
+	bmi260_get_scale(data, BMI260_ACCEL, &data->conf.accel_scale);
+	bmi260_get_scale(data, BMI260_GYRO, &data->conf.gyro_scale);
+	bmi260_get_odr(data, BMI260_ACCEL, &data->conf.accel_odr, &data->conf.accel_uodr);
+	bmi260_get_odr(data, BMI260_GYRO, &data->conf.gyro_odr, &data->conf.gyro_uodr);
 	bmi260_chip_uninit(data);
 	return 0;
 }
