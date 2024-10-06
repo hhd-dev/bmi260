@@ -857,7 +857,9 @@ static int bmi260_data_rdy_trigger_set_state(struct iio_trigger *trig,
 {
 	struct iio_dev *indio_dev = iio_trigger_get_drvdata(trig);
 	struct bmi260_data *data = iio_priv(indio_dev);
-
+	// FIXME: the irq enable func is exported, it could be called from elsewhere
+	data->conf.irq = enable;
+	
 	return bmi260_enable_irq(data->regmap, data->int_pin, enable);
 }
 static const struct iio_trigger_ops bmi260_trigger_ops = {
@@ -992,6 +994,7 @@ static int bmi260_chip_resume(struct device *dev) {
 	bmi260_set_scale(data, BMI260_GYRO, data->conf.gyro_scale);
 	bmi260_set_odr(data, BMI260_ACCEL, data->conf.accel_odr, data->conf.accel_uodr);
 	bmi260_set_odr(data, BMI260_GYRO, data->conf.gyro_odr, data->conf.gyro_uodr);
+	bmi260_enable_irq(data->regmap, data->int_pin, data->conf.irq);
 	return 0;
 }
 
@@ -1005,7 +1008,9 @@ static int bmi260_chip_suspend(struct device *dev) {
 	return 0;
 }
 
-EXPORT_SIMPLE_DEV_PM_OPS(bmi260_pm_ops, bmi260_chip_suspend, bmi260_chip_resume);
+EXPORT_GPL_DEV_SLEEP_PM_OPS(bmi260_pm_ops) = {
+	LATE_SYSTEM_SLEEP_PM_OPS(bmi260_chip_suspend, bmi260_chip_resume)
+};
 
 MODULE_AUTHOR("Justin Weiss <justin@justinweiss.com>");
 MODULE_DESCRIPTION("Bosch BMI260 driver");

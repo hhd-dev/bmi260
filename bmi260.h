@@ -17,6 +17,7 @@ struct bmi260_config {
 	int gyro_scale;
 	int gyro_odr;
 	int gyro_uodr;
+	bool irq;
 };
 
 struct bmi260_data {
