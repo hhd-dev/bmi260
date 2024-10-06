@@ -471,6 +471,9 @@ static irqreturn_t bmi260_trigger_handler(int irq, void *p)
 	int i, ret, j = 0, base = BMI260_REG_DATA_AUX_XOUT_L;
 	__le16 sample;
 
+	if (data->conf.suspended)
+		return IRQ_NONE;
+
 	for_each_set_bit(i, indio_dev->active_scan_mask,
 			 indio_dev->masklength) {
 		ret = regmap_bulk_read(data->regmap, base + i * sizeof(sample),
@@ -995,11 +998,13 @@ static int bmi260_chip_resume(struct device *dev) {
 	bmi260_set_odr(data, BMI260_ACCEL, data->conf.accel_odr, data->conf.accel_uodr);
 	bmi260_set_odr(data, BMI260_GYRO, data->conf.gyro_odr, data->conf.gyro_uodr);
 	bmi260_enable_irq(data->regmap, data->int_pin, data->conf.irq);
+	data->conf.suspended = false;
 	return 0;
 }
 
 static int bmi260_chip_suspend(struct device *dev) {
 	struct bmi260_data *data = iio_priv(dev_get_drvdata(dev));
+	data->conf.suspended = true;
 	bmi260_get_scale(data, BMI260_ACCEL, &data->conf.accel_scale);
 	bmi260_get_scale(data, BMI260_GYRO, &data->conf.gyro_scale);
 	bmi260_get_odr(data, BMI260_ACCEL, &data->conf.accel_odr, &data->conf.accel_uodr);
