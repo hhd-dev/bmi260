@@ -75,4 +75,4 @@ module_i2c_driver(bmi260_i2c_driver);
 MODULE_AUTHOR("Justin Weiss <justin@justinweiss.com>");
 MODULE_DESCRIPTION("BMI260 I2C driver");
 MODULE_LICENSE("GPL v2");
-MODULE_IMPORT_NS(IIO_BMI260);
+BMI260_IMPORT_NS;

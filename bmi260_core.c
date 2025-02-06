@@ -141,7 +141,7 @@ const struct regmap_config bmi260_regmap_config = {
 	.reg_bits = 8,
 	.val_bits = 8,
 };
-EXPORT_SYMBOL_NS(bmi260_regmap_config, IIO_BMI260);
+BMI260_EXPORT_SYMBOL(bmi260_regmap_config);
 
 struct bmi260_regs {
 	u8 data; /* LSB byte register for X-axis */
@@ -683,7 +683,7 @@ int bmi260_enable_irq(struct regmap *regmap, enum bmi260_int_pin pin, bool enabl
 				     mask, enable_bit,
 				     BMI260_NORMAL_WRITE_USLEEP);
 }
-EXPORT_SYMBOL_NS(bmi260_enable_irq, IIO_BMI260);
+BMI260_EXPORT_SYMBOL(bmi260_enable_irq);
 
 static int bmi260_get_irq(struct fwnode_handle *fwnode, enum bmi260_int_pin *pin)
 {
@@ -986,7 +986,7 @@ int bmi260_core_probe(struct device *dev, struct regmap *regmap,
 
 	return devm_iio_device_register(dev, indio_dev);
 }
-EXPORT_SYMBOL_NS_GPL(bmi260_core_probe, IIO_BMI260);
+BMI260_EXPORT_SYMBOL(bmi260_core_probe);
 
 static int bmi260_chip_resume(struct device *dev) {
 	struct bmi260_data *data = iio_priv(dev_get_drvdata(dev));
